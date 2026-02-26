@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AGCM | Archivo General de la Constitución Mexicana</title>
+    
+    <!-- LIBRERÍAS EXTERNAS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- FUENTES Y ESTILOS PROPIOS -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+    <!-- Navbar -->
+    <nav class="bg-slate-900 text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-3">
+                    <i data-lucide="scale" class="h-8 w-8 text-amber-500"></i>
+                    <div>
+                        <span class="font-bold text-xl tracking-tight">AGCM</span>
+                        <span class="text-xs block text-slate-400 font-light">Archivo General de la Constitución Mexicana</span>
+                    </div>
+                </div>
+                <!-- Menú -->
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#" class="bg-slate-800 hover:bg-slate-700 px-3 py-2 rounded-md text-sm font-medium transition" onclick="switchView('search')">Buscador</a>
+                        <div class="flex items-center gap-2 ml-4 px-3 py-1 bg-slate-800 rounded-full border border-slate-700">
+                            <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                            <span class="text-xs text-slate-300">Base de Datos: V 2025.10</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenido Principal -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full relative">
+        
+        <!-- VISTA 1: BUSCADOR -->
+        <section id="view-search" class="space-y-6 fade-in">
+            <!-- Encabezado -->
+            <div class="text-center py-8">
+                <h1 class="text-3xl font-bold text-slate-900 mb-2">Motor de Búsqueda Constitucional</h1>
+                <p class="text-slate-600 mb-6 max-w-2xl mx-auto">
+                    Busca términos como <span class="font-mono text-amber-600 bg-amber-50 px-1 rounded">penas</span>, <span class="font-mono text-amber-600 bg-amber-50 px-1 rounded">derechos humanos</span> o <span class="font-mono text-amber-600 bg-amber-50 px-1 rounded">familia</span>.
+                </p>
+                
+                <div class="max-w-3xl mx-auto relative group">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i data-lucide="search" class="h-5 w-5 text-slate-400"></i>
+                    </div>
+                    <!-- Input con evento Enter -->
+                    <input type="text" id="searchInput" 
+                           class="block w-full pl-10 pr-24 py-4 border-none rounded-xl bg-white shadow-lg ring-1 ring-slate-200 focus:ring-2 focus:ring-amber-500 text-lg transition placeholder:text-slate-400" 
+                           placeholder="Escribe aquí tu consulta jurídica..."
+                           onkeyup="if(event.key === 'Enter') performSearch()">
+                    <button onclick="performSearch()" class="absolute right-2 top-2 bottom-2 bg-slate-900 text-white px-6 rounded-lg font-medium hover:bg-slate-800 transition flex items-center gap-2">
+                        Buscar
+                    </button>
+                </div>
+                
+                <!-- Filtros -->
+                <div class="flex flex-wrap justify-center gap-3 mt-6">
+                    <select id="filterScope" onchange="performSearch()" class="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-700 focus:outline-none focus:border-amber-500 cursor-pointer hover:border-slate-300">
+                        <option value="all">Ámbito: Todos</option>
+                        <option value="federal">Federal (CPEUM)</option>
+                        <option value="local">Local (Estatal)</option>
+                    </select>
+                    <select id="filterState" onchange="performSearch()" class="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-700 focus:outline-none focus:border-amber-500 cursor-pointer hover:border-slate-300">
+                        <option value="all">Estado: Todos</option>
+                        <option value="cuu">Chihuahua</option>
+                        <option value="gua">Guanajuato</option>
+                        <option value="hid">Hidalgo</option>
+                        <option value="cdmx">Ciudad de México</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Resultados -->
+            <div id="resultsContainer" class="grid grid-cols-1 md:grid-cols-12 gap-6">
+                <!-- Barra Lateral -->
+                <aside class="md:col-span-3 space-y-4">
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 sticky top-24">
+                        <h3 class="font-semibold text-slate-800 mb-3 flex items-center gap-2">
+                            <i data-lucide="filter" class="h-4 w-4"></i> Filtros Activos
+                        </h3>
+                        <div id="activeFilters" class="text-sm text-slate-500 mb-4">
+                            Ninguno
+                        </div>
+                        <h3 class="font-semibold text-slate-800 mb-3 flex items-center gap-2 border-t pt-3 border-slate-100">
+                            <i data-lucide="file-text" class="h-4 w-4"></i> Fuentes
+                        </h3>
+                        <ul class="space-y-2 text-xs text-slate-600">
+                            <li class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-slate-800"></span>CPEUM (2025)</li>
+                            <li class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-purple-500"></span>Chihuahua (2025)</li>
+                            <li class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-blue-500"></span>Guanajuato (2020)</li>
+                            <li class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-green-500"></span>Hidalgo (2025)</li>
+                            <li class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-pink-500"></span>CDMX (2023)</li>
+                        </ul>
+                    </div>
+                </aside>
+
+                <!-- Lista -->
+                <div class="md:col-span-9 space-y-4 min-h-[400px]" id="articlesList">
+                    <!-- Contenido inicial -->
+                    <div class="text-center text-slate-400 py-20 bg-white rounded-xl border border-slate-100 border-dashed">
+                        <i data-lucide="search" class="h-12 w-12 mx-auto mb-3 opacity-20"></i>
+                        <p class="text-lg font-medium text-slate-500">¿Qué deseas consultar hoy?</p>
+                        <p class="text-sm">Prueba buscando "pena de muerte" o "artículo 123"</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VISTA 2: ANÁLISIS (IA MOCK) -->
+        <section id="view-analysis" class="hidden fade-in space-y-6">
+            <div class="bg-amber-50 border-l-4 border-amber-500 p-4 mb-6 rounded-r">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <i data-lucide="alert-triangle" class="h-5 w-5 text-amber-600"></i>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm text-amber-700">
+                            Análisis automático de discrepancias entre la CPEUM (Última reforma 2025) y constituciones locales.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Federal -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                    <div class="flex items-center gap-2 mb-4 border-b pb-2">
+                        <span class="bg-slate-800 text-white px-2 py-1 rounded text-xs font-bold uppercase">CPEUM - Federal</span>
+                        <h3 class="font-bold text-lg">Artículo 116</h3>
+                    </div>
+                    <p class="text-slate-700 leading-relaxed text-sm">
+                        Los poderes de los Estados se organizarán conforme a la Constitución de cada uno de ellos... Los gobernadores de los Estados no podrán durar en su encargo más de seis años.
+                    </p>
+                </div>
+
+                <!-- Local -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 relative">
+                    <div class="absolute top-0 right-0 bg-amber-500 text-white text-xs px-2 py-1 rounded-bl-lg font-bold">
+                        Posible Discrepancia
+                    </div>
+                    <div class="flex items-center gap-2 mb-4 border-b pb-2">
+                        <span class="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs font-bold uppercase border border-purple-200">Chihuahua</span>
+                        <h3 class="font-bold text-lg">Artículo 89 (Interpretación)</h3>
+                    </div>
+                    <p class="text-slate-700 leading-relaxed text-sm highlight-gap p-2 rounded">
+                        ...el ejercicio del Poder Ejecutivo se deposita en un ciudadano que se denominará Gobernador... [Se requiere validar límites de reelección tras reforma federal 2025].
+                    </p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Modal Detalle -->
+    <div id="articleModal" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true">
+        <div class="fixed inset-0 bg-slate-900 bg-opacity-75 transition-opacity backdrop-blur-sm" onclick="closeModal()"></div>
+        <div class="fixed inset-0 z-10 overflow-y-auto">
+            <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+                <div class="relative transform overflow-hidden rounded-xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-3xl">
+                    
+                    <div class="bg-slate-50 px-4 py-4 sm:px-6 flex justify-between items-center border-b border-slate-200">
+                        <h3 class="text-lg font-bold text-slate-900" id="modalTitle">Título</h3>
+                        <button type="button" class="text-slate-400 hover:text-slate-600 transition" onclick="closeModal()">
+                            <i data-lucide="x" class="h-6 w-6"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="px-6 py-6 max-h-[60vh] overflow-y-auto">
+                        <div class="mb-4 flex items-center gap-2">
+                            <span id="modalSourceBadge" class="px-2 py-1 rounded text-xs font-bold uppercase">Fuente</span>
+                            <span id="modalDate" class="text-xs text-slate-400 font-mono"></span>
+                        </div>
+                        <div class="prose prose-slate max-w-none text-slate-700 text-sm leading-7 whitespace-pre-line" id="modalContent">
+                            <!-- Texto -->
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6 gap-2 border-t border-slate-200">
+                        <button type="button" class="inline-flex w-full justify-center rounded-lg bg-white px-4 py-2 text-sm font-semibold text-slate-900 shadow-sm ring-1 ring-inset ring-slate-300 hover:bg-slate-50 sm:mt-0 sm:w-auto transition" onclick="closeModal()">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Lógica Principal -->
+    <script src="app.js"></script>
+</body>
+</html>
