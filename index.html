@@ -5,17 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AGCM | Archivo General de la Constitución Mexicana</title>
     
-    <!-- LIBRERÍAS EXTERNAS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     
-    <!-- FUENTES Y ESTILOS PROPIOS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
 
-    <!-- Navbar -->
     <nav class="bg-slate-900 text-white shadow-lg sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
@@ -26,7 +25,6 @@
                         <span class="text-xs block text-slate-400 font-light">Archivo General de la Constitución Mexicana</span>
                     </div>
                 </div>
-                <!-- Menú -->
                 <div class="hidden md:block">
                     <div class="ml-10 flex items-baseline space-x-4">
                         <a href="#" class="bg-slate-800 hover:bg-slate-700 px-3 py-2 rounded-md text-sm font-medium transition" onclick="switchView('search')">Buscador</a>
@@ -40,12 +38,9 @@
         </div>
     </nav>
 
-    <!-- Contenido Principal -->
     <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full relative">
         
-        <!-- VISTA 1: BUSCADOR -->
         <section id="view-search" class="space-y-6 fade-in">
-            <!-- Encabezado -->
             <div class="text-center py-8">
                 <h1 class="text-3xl font-bold text-slate-900 mb-2">Motor de Búsqueda Constitucional</h1>
                 <p class="text-slate-600 mb-6 max-w-2xl mx-auto">
@@ -56,7 +51,6 @@
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <i data-lucide="search" class="h-5 w-5 text-slate-400"></i>
                     </div>
-                    <!-- Input con evento Enter -->
                     <input type="text" id="searchInput" 
                            class="block w-full pl-10 pr-24 py-4 border-none rounded-xl bg-white shadow-lg ring-1 ring-slate-200 focus:ring-2 focus:ring-amber-500 text-lg transition placeholder:text-slate-400" 
                            placeholder="Escribe aquí tu consulta jurídica..."
@@ -66,7 +60,6 @@
                     </button>
                 </div>
                 
-                <!-- Filtros -->
                 <div class="flex flex-wrap justify-center gap-3 mt-6">
                     <select id="filterScope" onchange="performSearch()" class="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-700 focus:outline-none focus:border-amber-500 cursor-pointer hover:border-slate-300">
                         <option value="all">Ámbito: Todos</option>
@@ -83,9 +76,7 @@
                 </div>
             </div>
 
-            <!-- Resultados -->
             <div id="resultsContainer" class="grid grid-cols-1 md:grid-cols-12 gap-6">
-                <!-- Barra Lateral -->
                 <aside class="md:col-span-3 space-y-4">
                     <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 sticky top-24">
                         <h3 class="font-semibold text-slate-800 mb-3 flex items-center gap-2">
@@ -107,9 +98,7 @@
                     </div>
                 </aside>
 
-                <!-- Lista -->
                 <div class="md:col-span-9 space-y-4 min-h-[400px]" id="articlesList">
-                    <!-- Contenido inicial -->
                     <div class="text-center text-slate-400 py-20 bg-white rounded-xl border border-slate-100 border-dashed">
                         <i data-lucide="search" class="h-12 w-12 mx-auto mb-3 opacity-20"></i>
                         <p class="text-lg font-medium text-slate-500">¿Qué deseas consultar hoy?</p>
@@ -119,7 +108,6 @@
             </div>
         </section>
 
-        <!-- VISTA 2: ANÁLISIS (IA MOCK) -->
         <section id="view-analysis" class="hidden fade-in space-y-6">
             <div class="bg-amber-50 border-l-4 border-amber-500 p-4 mb-6 rounded-r">
                 <div class="flex">
@@ -135,7 +123,6 @@
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- Federal -->
                 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
                     <div class="flex items-center gap-2 mb-4 border-b pb-2">
                         <span class="bg-slate-800 text-white px-2 py-1 rounded text-xs font-bold uppercase">CPEUM - Federal</span>
@@ -146,7 +133,6 @@
                     </p>
                 </div>
 
-                <!-- Local -->
                 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 relative">
                     <div class="absolute top-0 right-0 bg-amber-500 text-white text-xs px-2 py-1 rounded-bl-lg font-bold">
                         Posible Discrepancia
@@ -164,7 +150,6 @@
 
     </main>
 
-    <!-- Modal Detalle -->
     <div id="articleModal" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true">
         <div class="fixed inset-0 bg-slate-900 bg-opacity-75 transition-opacity backdrop-blur-sm" onclick="closeModal()"></div>
         <div class="fixed inset-0 z-10 overflow-y-auto">
@@ -184,8 +169,7 @@
                             <span id="modalDate" class="text-xs text-slate-400 font-mono"></span>
                         </div>
                         <div class="prose prose-slate max-w-none text-slate-700 text-sm leading-7 whitespace-pre-line" id="modalContent">
-                            <!-- Texto -->
-                        </div>
+                            </div>
                     </div>
 
                     <div class="bg-slate-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6 gap-2 border-t border-slate-200">
@@ -196,7 +180,6 @@
         </div>
     </div>
     
-    <!-- Lógica Principal -->
     <script src="app.js"></script>
 </body>
 </html>

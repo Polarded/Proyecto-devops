@@ -1,28 +1,112 @@
-// --- 1. BASE DE DATOS COMPLETA ---
+// --- 1. BASE DE DATOS INICIAL ---
 const database = [
-    // FEDERAL (CPEUM)
-    { id: "cpeum-1", sourceName: "CPEUM (Federal)", stateCode: "federal", title: "Artículo 1 - Derechos Humanos", content: "En los Estados Unidos Mexicanos todas las personas gozarán de los derechos humanos reconocidos en esta Constitución y en los tratados internacionales...", tags: ["discriminacion", "humanos", "garantias", "genero"] },
-    { id: "cpeum-3", sourceName: "CPEUM (Federal)", stateCode: "federal", title: "Artículo 3 - Educación", content: "Toda persona tiene derecho a la educación. El Estado -Federación, Estados, Ciudad de México y Municipios- impartirá y garantizará la educación inicial, preescolar, primaria, secundaria, media superior y superior...", tags: ["escuela", "maestros", "obligatoria", "universidad"] },
-    { id: "cpeum-22", sourceName: "CPEUM (Federal)", stateCode: "federal", title: "Artículo 22 - Prohibición de Penas", content: "Quedan prohibidas las penas de muerte, de mutilación, de infamia, la marca, los azotes, los palos, el tormento de cualquier especie... Toda pena deberá ser proporcional al delito.", tags: ["muerte", "tortura", "multa", "delito"] },
-    { id: "cpeum-27", sourceName: "CPEUM (Federal)", stateCode: "federal", title: "Artículo 27 - Propiedad y Tierras", content: "La propiedad de las tierras y aguas comprendidas dentro de los límites del territorio nacional, corresponde originariamente a la Nación...", tags: ["propiedad", "tierra", "ejido", "nacion"] },
-    { id: "cpeum-123", sourceName: "CPEUM (Federal)", stateCode: "federal", title: "Artículo 123 - Trabajo", content: "Toda persona tiene derecho al trabajo digno y socialmente útil; al efecto, se promoverán la creación de empleos y la organización social de trabajo...", tags: ["laboral", "sueldo", "huelga", "obrero"] },
-
-    // CHIHUAHUA
-    { id: "cuu-4", sourceName: "Chihuahua", stateCode: "cuu", title: "Artículo 4 - Igualdad y Familia", content: "El varón y la mujer son iguales ante la ley. Esta protegerá la organización y el desarrollo de la familia. En el Estado de Chihuahua se prohíbe toda discriminación...", tags: ["familia", "mujer", "genero", "discriminacion"] },
-    { id: "cuu-64", sourceName: "Chihuahua", stateCode: "cuu", title: "Artículo 64 - Facultades del Congreso", content: "Son facultades del Congreso: I. Legislar en todas las materias que no sean de la competencia exclusiva de la Federación; II. Decretar las contribuciones necesarias...", tags: ["leyes", "diputados", "presupuesto"] },
-
-    // GUANAJUATO
-    { id: "gua-1", sourceName: "Guanajuato", stateCode: "gua", title: "Artículo 1 - Derecho a la Vida", content: "El Estado de Guanajuato reconoce, protege y garantiza el derecho a la vida de todo ser humano, desde el momento de la fecundación hasta la muerte natural...", tags: ["vida", "fecundacion", "muerte", "bioetica"] },
-    { id: "gua-3", sourceName: "Guanajuato", stateCode: "gua", title: "Artículo 3 - División de Poderes", content: "El Poder Público del Estado se divide para su ejercicio en Legislativo, Ejecutivo y Judicial. No podrán reunirse dos o más de estos poderes...", tags: ["gobierno", "poderes", "democracia"] },
-
-    // HIDALGO
-    { id: "hid-10", sourceName: "Hidalgo", stateCode: "hid", title: "Artículo 10 - Soberanía", content: "El Estado de Hidalgo, como integrante de la Federación, es libre y soberano en todo lo que concierne a su régimen interior...", tags: ["autonomia", "soberania", "federacion"] },
-    { id: "hid-20", sourceName: "Hidalgo", stateCode: "hid", title: "Artículo 20 - Supremacía", content: "La Constitución Política de los Estados Unidos Mexicanos, esta Constitución, las Leyes que de ellas emanen y los Tratados Internacionales... son la Ley Suprema del Estado.", tags: ["ley suprema", "jerarquia"] },
-
-    // CDMX
-    { id: "cdmx-a", sourceName: "Ciudad de México", stateCode: "cdmx", title: "Carta de Derechos", content: "La Ciudad de México garantiza el pleno ejercicio de los derechos humanos y libertades fundamentales. La esclavitud y la pena de muerte están prohibidas.", tags: ["derechos", "libertad", "capital"] },
-    { id: "cdmx-32", sourceName: "Ciudad de México", stateCode: "cdmx", title: "Artículo 32 - Jefatura de Gobierno", content: "La persona titular de la Jefatura de Gobierno tendrá a su cargo la administración pública de la Ciudad de México. Será elegida por votación universal...", tags: ["jefe de gobierno", "ejecutivo", "administracion"] }
+    // Aquí dejamos los manuales que ya tenías como ejemplo por si los PDFs tardan en cargar
+    { id: "cpeum-1-ejemplo", sourceName: "CPEUM (Federal)", stateCode: "federal", title: "ARTÍCULO 1", content: "En los Estados Unidos Mexicanos todas las personas gozarán de los derechos humanos reconocidos en esta Constitución...", tags: ["discriminacion", "humanos", "garantias", "genero"] },
+    { id: "cdmx-a-ejemplo", sourceName: "Ciudad de México", stateCode: "cdmx", title: "Carta de Derechos", content: "La Ciudad de México garantiza el pleno ejercicio de los derechos humanos y libertades fundamentales...", tags: ["derechos", "libertad", "capital"] }
 ];
+
+// --- 1.5 LECTURA E INTEGRACIÓN DE PDFs ---
+
+// Configurar el worker de PDF.js
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+
+// Lista de tus archivos PDF en la carpeta
+const pdfFilesToLoad = [
+    { id: "pdf-cpeum", sourceName: "CPEUM (Federal)", stateCode: "federal", url: "./CPEUM.pdf", tags: ["constitucion", "federal"] },
+    { id: "pdf-cuu", sourceName: "Chihuahua", stateCode: "cuu", url: "./cuu.pdf", tags: ["estatal", "chihuahua"] },
+    { id: "pdf-gua", sourceName: "Guanajuato", stateCode: "gua", url: "./gua.pdf", tags: ["estatal", "guanajuato"] },
+    { id: "pdf-hid", sourceName: "Hidalgo", stateCode: "hid", url: "./HID.pdf", tags: ["estatal", "hidalgo"] },
+    { id: "pdf-cdmx", sourceName: "Ciudad de México", stateCode: "cdmx", url: "./CDMX.pdf", tags: ["estatal", "capital"] }
+];
+
+// Función para extraer texto completo de un PDF
+async function extractTextFromPDF(url) {
+    try {
+        const loadingTask = pdfjsLib.getDocument(url);
+        const pdf = await loadingTask.promise;
+        let fullText = "";
+
+        for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+            const page = await pdf.getPage(pageNum);
+            const textContent = await page.getTextContent();
+            const pageText = textContent.items.map(item => item.str).join(" ");
+            fullText += pageText + " \n"; // Agregamos un salto de línea por página por si acaso
+        }
+        return fullText;
+    } catch (error) {
+        console.error(`Error cargando el PDF ${url}:`, error);
+        return "";
+    }
+}
+
+// NUEVA FUNCIÓN: Cortar el texto gigante en artículos individuales
+function splitIntoArticles(fullText, fileInfo) {
+    // Esta expresión regular busca la palabra "Artículo" (o ARTÍCULO) seguida de un número.
+    // El (?=...) asegura que cortemos el texto justo ANTES de la palabra "Artículo", para no borrarla.
+    const regex = /(?=\bART[IÍ]CULO\s+\d+)/gi;
+    
+    // Cortamos el texto gigante
+    const parts = fullText.split(regex);
+    
+    const articlesArray = [];
+    let counter = 1;
+
+    parts.forEach(part => {
+        const textContent = part.trim();
+        
+        // Descartamos pedazos muy pequeños (como el índice, la portada o páginas en blanco)
+        if (textContent.length < 50) return;
+
+        // Intentamos extraer el nombre exacto del artículo para el título (ej. "ARTÍCULO 1o.")
+        const titleMatch = textContent.match(/^(ART[IÍ]CULO\s+\d+[a-z°\.]*)/i);
+        
+        // Si encuentra el patrón, usa ese título. Si no (por ejemplo en un preámbulo largo), usa un título genérico.
+        const title = titleMatch ? titleMatch[1].toUpperCase() : `Sección General - Fragmento ${counter}`;
+        
+        articlesArray.push({
+            id: `${fileInfo.id}-art-${counter}`,
+            sourceName: fileInfo.sourceName,
+            stateCode: fileInfo.stateCode,
+            title: title,
+            content: textContent,
+            tags: fileInfo.tags // Hereda las etiquetas del archivo principal
+        });
+        
+        counter++;
+    });
+
+    return articlesArray;
+}
+
+// Función para cargar todos los PDFs y separarlos
+async function loadAllPdfs() {
+    const container = document.getElementById('articlesList');
+    if(container) {
+        container.innerHTML = `
+            <div class="text-center py-20 bg-white rounded-xl border border-slate-100 shadow-sm">
+                <i data-lucide="book-open" class="h-10 w-10 mx-auto text-amber-500 mb-4 animate-bounce"></i>
+                <p class="text-lg font-bold text-slate-800 mb-2">Procesando Leyes y Constituciones...</p>
+                <p class="text-sm text-slate-500">Separando los artículos uno por uno. Esto puede tardar unos segundos.</p>
+            </div>
+        `;
+        lucide.createIcons();
+    }
+
+    for (const file of pdfFilesToLoad) {
+        const text = await extractTextFromPDF(file.url);
+        
+        if (text) {
+            // Pasamos el texto extraído por nuestra "guillotina" de artículos
+            const separatedArticles = splitIntoArticles(text, file);
+            
+            // Añadimos todos los artículos resultantes a la base de datos global
+            database.push(...separatedArticles);
+        }
+    }
+    
+    // Una vez procesados todos los archivos, mostramos los resultados
+    performSearch();
+}
 
 // --- 2. Funciones Auxiliares ---
 const normalize = (text) => text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
@@ -36,7 +120,6 @@ function performSearch() {
     const container = document.getElementById('articlesList');
     const activeFiltersDiv = document.getElementById('activeFilters');
 
-    // Actualizar texto de filtros
     if (!rawQuery) {
         activeFiltersDiv.innerHTML = 'Mostrando todo';
     } else {
@@ -47,7 +130,6 @@ function performSearch() {
         `;
     }
 
-    // Filtrar (Si query está vacío, muestra todo lo que coincida con los filtros)
     let results = database.filter(item => {
         const textMatch = !query || 
             normalize(item.content).includes(query) ||
@@ -72,26 +154,28 @@ function renderResults(results, container, rawQuery) {
         container.innerHTML = `
             <div class="bg-white p-8 rounded-xl text-center shadow-sm border border-slate-200">
                 <i data-lucide="search-x" class="h-10 w-10 mx-auto text-slate-300 mb-4"></i>
-                <h3 class="text-lg font-medium text-slate-900">No se encontraron temas</h3>
-                <p class="text-slate-500 mt-2 text-sm">Intenta ajustar los filtros de Estado o Ámbito.</p>
+                <h3 class="text-lg font-medium text-slate-900">No se encontraron artículos</h3>
+                <p class="text-slate-500 mt-2 text-sm">Intenta ajustar tu búsqueda o los filtros.</p>
             </div>
         `;
         lucide.createIcons();
         return;
     }
 
-    // Header de resultados
     const header = document.createElement('div');
     header.className = "flex justify-between items-end pb-4 border-b border-slate-100 mb-4";
     header.innerHTML = `
         <div>
             <span class="text-2xl font-bold text-slate-900">${results.length}</span>
-            <span class="text-sm text-slate-500 ml-1">temas disponibles</span>
+            <span class="text-sm text-slate-500 ml-1">artículos disponibles</span>
         </div>
     `;
     container.appendChild(header);
 
-    results.forEach(item => {
+    // Limitamos la renderización a los primeros 100 resultados para no colgar el navegador
+    const resultsToRender = results.slice(0, 100);
+
+    resultsToRender.forEach(item => {
         let badgeClass = "bg-slate-100 text-slate-600";
         if (item.stateCode === 'federal') badgeClass = "badge-federal";
         if (item.stateCode === 'cuu') badgeClass = "badge-cuu";
@@ -99,7 +183,6 @@ function renderResults(results, container, rawQuery) {
         if (item.stateCode === 'hid') badgeClass = "badge-hid";
         if (item.stateCode === 'cdmx') badgeClass = "badge-cdmx";
 
-        // Si hay búsqueda, resaltar. Si no, texto normal.
         let displayContent = item.content;
         let displayTitle = item.title;
 
@@ -132,6 +215,14 @@ function renderResults(results, container, rawQuery) {
         `;
         container.appendChild(card);
     });
+
+    if (results.length > 100) {
+        const warning = document.createElement('div');
+        warning.className = "text-center text-sm text-slate-500 py-4";
+        warning.textContent = `Mostrando los primeros 100 resultados de ${results.length}. Por favor, sé más específico en tu búsqueda.`;
+        container.appendChild(warning);
+    }
+
     lucide.createIcons();
 }
 
@@ -144,7 +235,6 @@ function openModal(id) {
     const badge = document.getElementById('modalSourceBadge');
     badge.textContent = article.sourceName;
     
-    // Reset clases del badge
     badge.className = "px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ";
     if (article.stateCode === 'federal') badge.classList.add('bg-slate-800', 'text-white');
     else if (article.stateCode === 'cuu') badge.classList.add('bg-purple-100', 'text-purple-800');
@@ -160,8 +250,8 @@ function closeModal() {
     document.getElementById('articleModal').classList.add('hidden');
 }
 
-// INICIALIZACIÓN: Cargar TODO al inicio
-window.onload = function() {
-    performSearch(); // Llama a la búsqueda sin query para mostrar todo
+// INICIALIZACIÓN
+window.onload = async function() {
+    await loadAllPdfs(); 
     lucide.createIcons();
 };
